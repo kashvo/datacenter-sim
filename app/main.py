@@ -28,7 +28,7 @@ app = FastAPI(
 )
 
 
-# ── middleware: tracks latency + request count for every endpoint ──────────────
+# ── middleware: tracks latency + request count for every endpoint ───────
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start = time.time()
@@ -55,13 +55,13 @@ async def metrics_middleware(request: Request, call_next):
     return response
 
 
-# ── routers ───────────────────────────────────────────────────────────────────
+# ── routers ─────────────────────────────────────────────────────────────
 app.include_router(auth.router)
 app.include_router(profile.router)
 app.include_router(data.router)
 
 
-# ── health check ──────────────────────────────────────────────────────────────
+# ── health check ────────────────────────────────────────────────────────
 @app.get("/health", response_model=HealthResponse)
 async def health():
     from app.db.fake_db import session_count
@@ -72,7 +72,18 @@ async def health():
     )
 
 
-# ── prometheus metrics ────────────────────────────────────────────────────────
+@app.get("/stats")
+async def stats():
+    from app.db.fake_db import session_count, user_count
+    return {
+        "status": "ok",
+        "total_users": user_count(),
+        "active_sessions": session_count(),
+        "uptime_seconds": round(time.time() - START_TIME, 2)
+    }
+
+
+# ── prometheus metrics ──────────────────────────────────────────────────
 @app.get("/metrics")
 async def metrics():
     return Response(
@@ -81,7 +92,7 @@ async def metrics():
     )
 
 
-# ── custom openapi: adds BearerAuth so Swagger shows the Authorize button ─────
+# ── custom openapi: adds BearerAuth so Swagger shows the Authorize button
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
