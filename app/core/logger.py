@@ -5,6 +5,7 @@ from pathlib import Path
 
 Path("logs").mkdir(exist_ok=True)
 
+
 class JSONFormatter(logging.Formatter):
     def format(self, record):
         log = {
@@ -22,6 +23,7 @@ class JSONFormatter(logging.Formatter):
             log["exception"] = self.formatException(record.exc_info)
 
         return json.dumps(log)
+
 
 def get_logger(name: str = "datacenter-sim") -> logging.Logger:
     logger = logging.getLogger(name)

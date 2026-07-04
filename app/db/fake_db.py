@@ -2,32 +2,49 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# pre-seeded users for simulation
-# Locust will log in as these users
-USERS = {
-    "webuser":    {"username": "webuser",    "hashed_password": pwd_context.hash("pass"), "role": "web"},
-    "mobileuser": {"username": "mobileuser", "hashed_password": pwd_context.hash("pass"), "role": "mobile"},
-    "apiuser":    {"username": "apiuser",    "hashed_password": pwd_context.hash("pass"), "role": "api"},
-}
 
-# in-memory session store
-# key = token, value = username
-SESSIONS: dict[str, str] = {}
+def seed_users(count=100):
+    users = {}
+    roles = ["web", "mobile", "api"]
+    hashed_pass = pwd_context.hash("pass")
+    for i in range(count):
+        role = roles[i % 3]
+        username = role + "user_" + str(i)
+        users[username] = {
+            "username": username,
+            "hashed_password": hashed_pass,
+            "role": role
+        }
+    return users
 
-def get_user(username: str):
+
+USERS = seed_users(100)
+SESSIONS = {}
+
+
+def get_user(username):
     return USERS.get(username)
 
-def verify_password(plain: str, hashed: str) -> bool:
+
+def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
 
-def create_session(token: str, username: str):
+
+def create_session(token, username):
     SESSIONS[token] = username
 
-def get_session(token: str):
+
+def get_session(token):
     return SESSIONS.get(token)
 
-def delete_session(token: str):
+
+def delete_session(token):
     SESSIONS.pop(token, None)
 
-def session_count() -> int:
+
+def session_count():
     return len(SESSIONS)
+
+
+def user_count():
+    return len(USERS)

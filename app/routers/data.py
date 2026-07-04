@@ -14,7 +14,7 @@ logger = get_logger()
 bearer = HTTPBearer()
 
 
-# ── shared dependency: validates token and returns username ───────────────────
+# ── shared dependency: validates token and returns username ─────────────
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer)
 ) -> str:
@@ -26,11 +26,12 @@ def get_current_user(
     token = credentials.credentials
     username = validate_token(token)
     if not username:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(
+            status_code=401, detail="Invalid or expired session")
     return username
 
 
-# ── GET /api/data ─────────────────────────────────────────────────────────────
+# ── GET /api/data ───────────────────────────────────────────────────────
 @router.get("/api/data", response_model=APIDataResponse)
 async def get_api_data(username: str = Depends(get_current_user)):
     """

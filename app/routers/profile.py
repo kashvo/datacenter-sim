@@ -16,7 +16,7 @@ logger = get_logger()
 bearer = HTTPBearer()
 
 
-# ── shared dependency: validates token and returns username ───────────────────
+# ── shared dependency: validates token and returns username ─────────────
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer)
 ) -> str:
@@ -28,11 +28,12 @@ def get_current_user(
     token = credentials.credentials
     username = validate_token(token)
     if not username:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(
+            status_code=401, detail="Invalid or expired session")
     return username
 
 
-# ── GET /me ───────────────────────────────────────────────────────────────────
+# ── GET /me ─────────────────────────────────────────────────────────────
 @router.get("/me", response_model=ProfileResponse)
 async def get_profile(username: str = Depends(get_current_user)):
     """
@@ -54,7 +55,7 @@ async def get_profile(username: str = Depends(get_current_user)):
     )
 
 
-# ── POST /profile/update ──────────────────────────────────────────────────────
+# ── POST /profile/update ────────────────────────────────────────────────
 @router.post("/profile/update", response_model=ProfileUpdateResponse)
 async def update_profile(
     body: ProfileUpdateRequest,
